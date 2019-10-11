@@ -15,7 +15,9 @@ pip install -r requirements.txt
 
 ### Usage example
 
-First of all you have to extract the contributions from the repositories that you want to take into consideration. For example:
+First of all you need to have a github access token, you can see how to obtain one in [the github help page for create personal tokens](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line). The token must have at least the `repo` permissions and the `read:org` persission.
+
+Then you have to extract the contributions from the repositories that you want to take into consideration. For example:
 
 ```sh
 python main.py contributors --token xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
@@ -28,7 +30,7 @@ python main.py contributors --token xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
     --json > contributions.json
 ```
 
-Then you have to get the staff (you can include or exclude members based on the members obtained by github, for example exclude ex-staff and include core commiters that are from the community). To do that you can execute the following command
+Then you have to get the staff (you can include or exclude members based on the members obtained by github, for example exclude ex-staff and include core commiters that are from the community). To do that you can execute the following command:
 
 ```sh
 python main.py staff --token xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
