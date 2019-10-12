@@ -47,6 +47,13 @@ def cli(staff_json, contributions_json):
             else:
                 contributions_per_user_last_year[contribution["user"]] = 1
 
+    new_contributors_per_month = collections.OrderedDict()
+    for contribution in first_contributions:
+        if contribution["date"][0:7] in new_contributors_per_month:
+            new_contributors_per_month[contribution["date"][0:7]] += 1
+        else:
+            new_contributors_per_month[contribution["date"][0:7]] = 1
+
     print("#### Contributions Per Month")
     for month, number in contributions_per_month.items():
         print("- {}: {} community contributions".format(month, number))
@@ -55,6 +62,11 @@ def cli(staff_json, contributions_json):
     print("#### Contributors Per Month")
     for month, users in contributors_per_month.items():
         print("- {}: {} community contributors".format(month, len(users)))
+    print()
+
+    print("#### First time contributors Per Month")
+    for month, number in new_contributors_per_month.items():
+        print("- {}: {} first time contributors".format(month, number))
     print()
 
     print("#### Contributions Per User")
