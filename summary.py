@@ -18,7 +18,8 @@ def cli(staff_json, contributions_json):
     first_contributions = []
     contributors = []
     contributions_per_month = collections.OrderedDict()
-    contributions_per_user = {}
+    contributors_per_month = collections.OrderedDict()
+    contributions_per_user = collections.OrderedDict()
     contributions_per_user_last_year = {}
     for contribution in contributions:
         if contribution["user"] not in contributors:
@@ -29,6 +30,11 @@ def cli(staff_json, contributions_json):
             contributions_per_month[contribution["date"][0:7]] += 1
         else:
             contributions_per_month[contribution["date"][0:7]] = 1
+
+        if contribution["date"][0:7] in contributors_per_month:
+            contributors_per_month[contribution["date"][0:7]].add(contribution["user"])
+        else:
+            contributors_per_month[contribution["date"][0:7]] = set([contribution["user"]])
 
         if contribution["user"] in contributions_per_user:
             contributions_per_user[contribution["user"]] += 1
@@ -46,11 +52,16 @@ def cli(staff_json, contributions_json):
         print("- {}: {} community contributions".format(month, number))
     print()
 
-    # print("#### Contributions Per User")
-    # print("----------------------")
-    # for user, number in contributions_per_user.items():
-    #     print("- {}: {} contributions".format(user, number))
-    # print()
+    print("#### Contributors Per Month")
+    for month, users in contributors_per_month.items():
+        print("- {}: {} community contributors".format(month, len(users)))
+    print()
+
+    print("#### Contributions Per User")
+    contributions_per_user = collections.OrderedDict(sorted(contributions_per_user.items(), key=lambda x: x[0]))
+    for user, number in contributions_per_user.items():
+        print("- {}: {} contributions".format(user, number))
+    print()
 
     print("#### Top community contributors")
     top25 = collections.OrderedDict(sorted(contributions_per_user.items(), key=lambda x: -x[1])[0:25])
@@ -64,10 +75,9 @@ def cli(staff_json, contributions_json):
         print("- {}: {} contributions".format(user, number))
     print()
 
-    print("#### First contribution Per User (Last year)")
+    print("#### First contribution Per User")
     for contrib in first_contributions:
-        if datetime.datetime.fromisoformat(contrib["date"][0:10]) > (datetime.datetime.now() - datetime.timedelta(days=365)):
-            print("- {}: {}".format(contrib['date'], contrib['user']))
+        print("- {}: {}".format(contrib['date'], contrib['user']))
     print()
 
 if __name__ == "__main__":
