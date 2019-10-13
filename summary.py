@@ -4,6 +4,17 @@ import collections
 import datetime
 import matplotlib.pyplot as plt
 
+tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
+             (44, 160, 44), (152, 223, 138), (214, 39, 40), (255, 152, 150),
+             (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),
+             (227, 119, 194), (247, 182, 210), (127, 127, 127), (199, 199, 199),
+             (188, 189, 34), (219, 219, 141), (23, 190, 207), (158, 218, 229)]
+
+for i in range(len(tableau20)):
+    r, g, b = tableau20[i]
+    tableau20[i] = (r / 255., g / 255., b / 255.)
+
+
 def monthToInt(date):
     return int(datetime.datetime.fromisoformat(date + "-01").strftime('%s'))
 
@@ -46,20 +57,8 @@ def printData(data):
         print("- {}: {}".format(contrib['date'], contrib['user']))
     print()
 
-def plotData(data):
-    tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
-                 (44, 160, 44), (152, 223, 138), (214, 39, 40), (255, 152, 150),
-                 (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),
-                 (227, 119, 194), (247, 182, 210), (127, 127, 127), (199, 199, 199),
-                 (188, 189, 34), (219, 219, 141), (23, 190, 207), (158, 218, 229)]
-
-    for i in range(len(tableau20)):
-        r, g, b = tableau20[i]
-        tableau20[i] = (r / 255., g / 255., b / 255.)
-
-    plt.figure(figsize=(24, 18))
-
-    ax = plt.subplot(111)
+def plotHistogramOfContributions(contributions_per_user, label, color, idx):
+    ax = plt.subplot(4, 1, idx)
     ax.spines["top"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -68,14 +67,42 @@ def plotData(data):
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().tick_left()
 
-    y_top = max(data['contributions_per_month'].values())
+    values = list(contributions_per_user.values())
+    total_one_time_contributors = len(list(filter(lambda x: x == 1, values)))
+    total_two_times_contributors = len(list(filter(lambda x: x == 2, values)))
+    total_three_times_contributors = len(list(filter(lambda x: x == 3, values)))
+    values = list(filter(lambda x: x != 1 and x != 2 and x != 3, values))
+    plt.tick_params(axis="both", which="both", length=0, bottom="off", top="off", labelbottom="on", left="off", right="off", labelleft="on")
+    plt.xticks(range(4, max(values), 5))
+    plt.xlim(4, max(values))
+    plt.hist(list(values), bins=max(values)-3)
+    plt.xlabel(
+        "Plus {} one time contributors\nPlus {} two times contributors\nPlus {} three times contributors".format(
+            total_one_time_contributors,
+            total_two_times_contributors,
+            total_three_times_contributors,
+        ),
+        fontsize=14
+    )
+
+def plotPerMonthData(months, values, label, color, idx):
+    ax = plt.subplot(4, 1, idx)
+    ax.spines["top"].set_visible(False)
+    ax.spines["bottom"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+
+    y_top = max(values)
 
     plt.ylim(0, y_top)
-    plt.xlim(monthToInt(list(data['contributions_per_month'].keys())[0]), monthToInt(list(data['contributions_per_month'].keys())[-1]))
+    plt.xlim(monthToInt(months[0]), monthToInt(months[-1]))
 
-    plt.yticks(range(0, y_top + 1, int(y_top/20)), [str(x) for x in range(0, y_top + 1, int(y_top/20))], fontsize=14)
+    plt.yticks(range(0, y_top + 1, int(y_top/15)), [str(x) for x in range(0, y_top + 1, int(y_top/15))], fontsize=14)
     xticks = []
-    for x, tick in enumerate(data['contributions_per_month'].keys()):
+    for x, tick in enumerate(months):
         if x % 4 == 0:
             xticks.append("\n" + tick + "\n")
         elif x % 4 == 1:
@@ -84,26 +111,20 @@ def plotData(data):
             xticks.append("\n" + tick + "\n")
         else:
             xticks.append(tick + "\n\n")
-    plt.xticks(list(map(monthToInt, data['contributions_per_month'].keys())), xticks, fontsize=10)
+    plt.xticks(list(map(monthToInt, months)), xticks, fontsize=9)
 
     for y in range(0, y_top + 1, int(y_top/20)):
-        plt.plot(list(map(monthToInt, data['contributions_per_month'].keys())), [y]*len(data['contributions_per_month'].keys()), "--", lw=1, color="black", alpha=0.3, antialiased=True)
+        plt.plot(list(map(monthToInt, months)), [y]*len(months), "--", lw=1, color="black", alpha=0.3, antialiased=True)
 
-    for x in list(map(monthToInt, data['contributions_per_month'].keys())):
+    for x in list(map(monthToInt, months)):
         plt.plot([x, x], [0, y_top], "--", lw=1, color="black", alpha=0.3, antialiased=True)
 
     plt.tick_params(axis="both", which="both", length=0, bottom="off", top="off", labelbottom="on", left="off", right="off", labelleft="on")
 
-    plt.plot(list(map(monthToInt, data['contributions_per_month'].keys())), list(data['contributions_per_month'].values()), lw=2.5, color=tableau20[0], antialiased=True)
-    plt.plot(list(map(monthToInt, data['contributors_per_month'].keys())), list(map(len, data['contributors_per_month'].values())), lw=2.5, color=tableau20[1], antialiased=True)
-    plt.plot(list(map(monthToInt, data['new_contributors_per_month'].keys())), list(map(len, data['new_contributors_per_month'].values())), lw=2.5, color=tableau20[2], antialiased=True)
+    plt.plot(list(map(monthToInt, months)), list(values), lw=2.5, color=color, antialiased=True)
 
-    label_pos = monthToInt(list(data['contributions_per_month'].keys())[-1]) + 60*60*24*30
-    plt.text(label_pos, list(data['contributions_per_month'].values())[-1] - 0.5, 'Contributions Per Month', fontsize=14, color=tableau20[0])
-    plt.text(label_pos, len(list(data['contributors_per_month'].values())[-1]) - 0.5, 'Contributors Per Month', fontsize=14, color=tableau20[1])
-    plt.text(label_pos, len(list(data['new_contributors_per_month'].values())[-1]) - 0.5, 'New Contributors Per Month', fontsize=14, color=tableau20[2])
-
-    plt.savefig("evolution.png", bbox_inches="tight")
+    label_pos = monthToInt(months[-1]) + 60*60*24*30
+    plt.text(label_pos, list(values)[-1] - 0.5, label, fontsize=14, color=color)
 
 @click.command()
 @click.option('--staff-json', '-s', required=True, help='The json file with the staff data')
@@ -168,7 +189,15 @@ def cli(staff_json, contributions_json, plot):
     }
 
     if plot:
-        plotData(data)
+        plt.figure(figsize=(20, 14))
+
+        months = list(contributions_per_month.keys())
+        plotPerMonthData(months, list(contributions_per_month.values()), "Contributions Per Month", tableau20[0], 1)
+        plotPerMonthData(months, list(map(len, contributors_per_month.values())), "Contributors Per Month", tableau20[1], 2)
+        plotPerMonthData(months, list(map(len, new_contributors_per_month.values())), "New Contributors Per Month", tableau20[2], 3)
+        plotHistogramOfContributions(contributions_per_user, "Contributions per user", tableau20[3], 4)
+
+        plt.savefig("plots.png", bbox_inches="tight")
     else:
         printData(data)
 
