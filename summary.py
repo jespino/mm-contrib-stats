@@ -34,6 +34,12 @@ def printData(data):
         print("- {}: {} first time contributors".format(month, len(users)))
     print()
 
+    print("#### Old Contributors Per Month")
+    for month in data['contributors_per_month'].keys():
+        total = len(data['contributors_per_month'][month]) - len(data['new_contributors_per_month'][month])
+        print("- {}: {} community contributors".format(month, total))
+    print()
+
     print("#### Contributions Per User")
     contributions_per_user = collections.OrderedDict(sorted(data['contributions_per_user'].items(), key=lambda x: x[0]))
     for user, number in contributions_per_user.items():
@@ -58,7 +64,7 @@ def printData(data):
     print()
 
 def plotHistogramOfContributions(contributions_per_user, label, color, idx):
-    ax = plt.subplot(4, 1, idx)
+    ax = plt.subplot(5, 1, idx)
     ax.spines["top"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -86,7 +92,7 @@ def plotHistogramOfContributions(contributions_per_user, label, color, idx):
     )
 
 def plotPerMonthData(months, values, label, color, idx):
-    ax = plt.subplot(4, 1, idx)
+    ax = plt.subplot(5, 1, idx)
     ax.spines["top"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -189,13 +195,15 @@ def cli(staff_json, contributions_json, plot):
     }
 
     if plot:
-        plt.figure(figsize=(20, 14))
+        plt.figure(figsize=(20, 18))
 
         months = list(contributions_per_month.keys())
         plotPerMonthData(months, list(contributions_per_month.values()), "Contributions Per Month", tableau20[0], 1)
         plotPerMonthData(months, list(map(len, contributors_per_month.values())), "Contributors Per Month", tableau20[1], 2)
         plotPerMonthData(months, list(map(len, new_contributors_per_month.values())), "New Contributors Per Month", tableau20[2], 3)
-        plotHistogramOfContributions(contributions_per_user, "Contributions per user", tableau20[3], 4)
+        old_contributors_per_month = list(map(lambda month: len(contributors_per_month[month]) - len(new_contributors_per_month[month]), months))
+        plotPerMonthData(months, old_contributors_per_month, "Old Contributors Per Month", tableau20[3], 4)
+        plotHistogramOfContributions(contributions_per_user, "Contributions per user", tableau20[4], 5)
 
         plt.savefig("plots.png", bbox_inches="tight")
     else:
