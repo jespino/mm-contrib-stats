@@ -31,7 +31,7 @@ def printData(data):
 
     print("#### First time contributors Per Month")
     for month, users in data['new_contributors_per_month'].items():
-        print("- {}: {} first time contributors".format(month, len(number)))
+        print("- {}: {} first time contributors".format(month, len(users)))
     print()
 
     print("#### Contributions Per User")
@@ -100,7 +100,7 @@ def plotPerMonthData(months, values, label, color, idx):
     plt.ylim(0, y_top)
     plt.xlim(monthToInt(months[0]), monthToInt(months[-1]))
 
-    plt.yticks(range(0, y_top + 1, int(y_top/15)), [str(x) for x in range(0, y_top + 1, int(y_top/15))], fontsize=14)
+    plt.yticks(range(0, y_top + 1, int(y_top/10)), [str(x) for x in range(0, y_top + 1, int(y_top/10))], fontsize=14)
     xticks = []
     for x, tick in enumerate(months):
         if x % 4 == 0:
@@ -113,7 +113,7 @@ def plotPerMonthData(months, values, label, color, idx):
             xticks.append(tick + "\n\n")
     plt.xticks(list(map(monthToInt, months)), xticks, fontsize=9)
 
-    for y in range(0, y_top + 1, int(y_top/20)):
+    for y in range(0, y_top + 1, int(y_top/10)):
         plt.plot(list(map(monthToInt, months)), [y]*len(months), "--", lw=1, color="black", alpha=0.3, antialiased=True)
 
     for x in list(map(monthToInt, months)):
