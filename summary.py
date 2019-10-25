@@ -24,6 +24,11 @@ def printData(data):
         print("- {}: {} community contributions".format(month, number))
     print()
 
+    print("#### Contributions Per Month (Accumulative)")
+    for month, number in data['accumulative_contributions_per_month'].items():
+        print("- {}: {} community contributions".format(month, number))
+    print()
+
     print("#### Contributors Per Month")
     for month, users in data['contributors_per_month'].items():
         print("- {}: {} community contributors".format(month, len(users)))
@@ -32,6 +37,11 @@ def printData(data):
     print("#### First time contributors Per Month")
     for month, users in data['new_contributors_per_month'].items():
         print("- {}: {} first time contributors".format(month, len(users)))
+    print()
+
+    print("#### First time contributors Per Month (Accumulative)")
+    for month, users in data['accumulative_new_contributors_per_month'].items():
+        print("- {}: {} first time contributors".format(month, users))
     print()
 
     print("#### Old Contributors Per Month")
@@ -64,7 +74,7 @@ def printData(data):
     print()
 
 def plotHistogramOfContributions(contributions_per_user, label, color, idx):
-    ax = plt.subplot(5, 1, idx)
+    ax = plt.subplot(8, 1, idx)
     ax.spines["top"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -92,7 +102,7 @@ def plotHistogramOfContributions(contributions_per_user, label, color, idx):
     )
 
 def plotPerMonthData(months, values, label, color, idx):
-    ax = plt.subplot(5, 1, idx)
+    ax = plt.subplot(8, 1, idx)
     ax.spines["top"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -177,6 +187,12 @@ def cli(staff_json, contributions_json, plot):
             else:
                 contributions_per_user_last_year[contribution["user"]] = 1
 
+    accumulative_contributions_per_month = collections.OrderedDict()
+    last_month = 0
+    for month, contributions in contributions_per_month.items():
+        accumulative_contributions_per_month[month] = last_month + contributions
+        last_month = accumulative_contributions_per_month[month]
+
     new_contributors_per_month = collections.OrderedDict()
     for contribution in first_contributions:
         if contribution["date"][0:7] in new_contributors_per_month:
@@ -184,10 +200,28 @@ def cli(staff_json, contributions_json, plot):
         else:
             new_contributors_per_month[contribution["date"][0:7]] = set([contribution["user"]])
 
+    accumulative_new_contributors_per_month = collections.OrderedDict()
+    last_month = 0
+    for month, contributors in new_contributors_per_month.items():
+        accumulative_new_contributors_per_month[month] = last_month + len(contributors)
+        last_month = accumulative_new_contributors_per_month[month]
+
+    active_contributors = collections.OrderedDict()
+    last_months = []
+    for month, contributors in contributors_per_month.items():
+        active_contributors[month] = contributors
+        for m in last_months:
+            active_contributors[month] = active_contributors[month].union(m)
+        last_months = [contributors] + last_months
+        last_months = last_months[0:4]
+
     data = {
         'contributions_per_month': contributions_per_month,
+        'accumulative_contributions_per_month': accumulative_contributions_per_month,
+        'active_contributors': active_contributors,
         'contributors_per_month': contributors_per_month,
         'new_contributors_per_month': new_contributors_per_month,
+        'accumulative_new_contributors_per_month': accumulative_new_contributors_per_month,
         'contributions_per_user': contributions_per_user,
         'contributions_per_user': contributions_per_user,
         'contributions_per_user_last_year': contributions_per_user_last_year,
@@ -195,15 +229,18 @@ def cli(staff_json, contributions_json, plot):
     }
 
     if plot:
-        plt.figure(figsize=(20, 18))
+        plt.figure(figsize=(20, 22))
 
         months = list(contributions_per_month.keys())
-        plotPerMonthData(months, list(contributions_per_month.values()), "Contributions Per Month", tableau20[0], 1)
-        plotPerMonthData(months, list(map(len, contributors_per_month.values())), "Contributors Per Month", tableau20[1], 2)
-        plotPerMonthData(months, list(map(len, new_contributors_per_month.values())), "New Contributors Per Month", tableau20[2], 3)
+        plotPerMonthData(months, list(contributions_per_month.values()), "Contributions\nPer Month", tableau20[0], 1)
+        plotPerMonthData(months, list(accumulative_contributions_per_month.values()), "Contributions\nPer Month\n(Accumulative)", tableau20[1], 2)
+        plotPerMonthData(months, list(map(len, contributors_per_month.values())), "Contributors\nPer Month", tableau20[2], 3)
+        plotPerMonthData(months, list(map(len, new_contributors_per_month.values())), "New Contributors\nPer Month", tableau20[3], 4)
+        plotPerMonthData(months, list(accumulative_new_contributors_per_month.values()), "New Contributors\nPer Month\n(Accumulative)", tableau20[4], 5)
         old_contributors_per_month = list(map(lambda month: len(contributors_per_month[month]) - len(new_contributors_per_month[month]), months))
-        plotPerMonthData(months, old_contributors_per_month, "Old Contributors Per Month", tableau20[3], 4)
-        plotHistogramOfContributions(contributions_per_user, "Contributions per user", tableau20[4], 5)
+        plotPerMonthData(months, old_contributors_per_month, "Old Contributors\nPer Month", tableau20[5], 6)
+        plotHistogramOfContributions(contributions_per_user, "Contributions\nper user", tableau20[6], 7)
+        plotPerMonthData(months, list(map(len, active_contributors.values())), "Active Contributions\nPer Month", tableau20[7], 8)
 
         plt.savefig("plots.png", bbox_inches="tight")
     else:
