@@ -29,6 +29,11 @@ def printData(data):
         print("- {}: {} community contributions".format(month, number))
     print()
 
+    print("#### Active contributions Per Month (Active in last 3 months)")
+    for month, users in data['active_contributors'].items():
+        print("- {}: {} community contributions".format(month, len(users)))
+    print()
+
     print("#### Contributors Per Month")
     for month, users in data['contributors_per_month'].items():
         print("- {}: {} community contributors".format(month, len(users)))
@@ -93,7 +98,7 @@ def plotHistogramOfContributions(contributions_per_user, label, color, idx):
     plt.xlim(4, max(values))
     plt.hist(list(values), bins=max(values)-3)
     plt.xlabel(
-        "Plus {} one time contributors\nPlus {} two times contributors\nPlus {} three times contributors".format(
+        "Plus:  {} one time contributors | {} two times contributors | {} three times contributors".format(
             total_one_time_contributors,
             total_two_times_contributors,
             total_three_times_contributors,
@@ -140,7 +145,7 @@ def plotPerMonthData(months, values, label, color, idx):
     plt.plot(list(map(monthToInt, months)), list(values), lw=2.5, color=color, antialiased=True)
 
     label_pos = monthToInt(months[-1]) + 60*60*24*30
-    plt.text(label_pos, list(values)[-1] - 0.5, label, fontsize=14, color=color)
+    plt.text(label_pos, y_top / 3, label, fontsize=14, color=color)
 
 @click.command()
 @click.option('--staff-json', '-s', required=True, help='The json file with the staff data')
@@ -229,7 +234,7 @@ def cli(staff_json, contributions_json, plot):
     }
 
     if plot:
-        plt.figure(figsize=(20, 22))
+        plt.figure(figsize=(20, 30))
 
         months = list(contributions_per_month.keys())
         plotPerMonthData(months, list(contributions_per_month.values()), "Contributions\nPer Month", tableau20[0], 1)
