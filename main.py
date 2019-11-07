@@ -98,6 +98,7 @@ def contributors(token, org, repo, json, csv):
                             "date": node["mergedAt"],
                             "user": node["author"]["login"],
                             "pr": node["number"],
+                            "repo": one_repo,
                         })
                     elif csv:
                         writer.writerow([node["number"], node["mergedAt"], node["author"]["login"]])

@@ -75,7 +75,7 @@ def printData(data):
 
     print("#### First contribution Per User")
     for contrib in data['first_contributions']:
-        print("- {}: {}".format(contrib['date'], contrib['user']))
+        print("- {}: {} (repo: {})".format(contrib['date'], contrib['user'], contrib['repo']))
     print()
 
 def plotHistogramOfContributions(contributions_per_user, label, color, idx):
