@@ -78,6 +78,18 @@ def printData(data):
         print("- {}: {} (repo: {})".format(contrib['date'], contrib['user'], contrib['repo']))
     print()
 
+    month, users = list(data['contributors_per_month'].items())[-1]
+    print("#### This month contributors (month: {})".format(month))
+    for user in sorted(users, key=str.casefold):
+        print("- {}".format(user))
+    print()
+
+    month, users = list(data['contributors_per_month'].items())[-2]
+    print("#### Last month contributors (month: {})".format(month))
+    for user in sorted(users, key=str.casefold):
+        print("- {}".format(user))
+    print()
+
 def plotHistogramOfContributions(contributions_per_user, label, color, idx):
     ax = plt.subplot(8, 1, idx)
     ax.spines["top"].set_visible(False)
