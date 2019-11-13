@@ -1,7 +1,7 @@
 #!/bin/sh
 
-python main.py staff --token $GITHUB_TOKEN --org mattermost --include ccbrown --include MusikPolice --include stephenkiers --include rgarmsen2295 --include yuya-oc --json > staff.json
-python main.py contributors --token $GITHUB_TOKEN --org mattermost --repo desktop --repo mmctl --repo mattermost-redux --repo mattermost-webapp --repo mattermost-server --repo mattermost-mobile --json > contributions.json
+python main.py staff --token $GITHUB_TOKEN --org mattermost --include ccbrown --include MusikPolice --include stephenkiers --include rgarmsen2295 --include yuya-oc --include DavidLu1997 --include thekiiingbob --include atti1a --json > staff.json
+python main.py contributors --token $GITHUB_TOKEN --org mattermost --repo desktop --repo mattermost-utilities --repo mmctl --repo mattermost-redux --repo mattermost-webapp --repo mattermost-server --repo mattermost-mobile --json > contributions.json
 python summary.py --staff-json staff.json --contributions-json contributions.json --plot
 python summary.py --staff-json staff.json --contributions-json contributions.json > summary.md
 
