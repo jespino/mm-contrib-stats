@@ -19,6 +19,11 @@ def monthToInt(date):
     return int(datetime.datetime.fromisoformat(date + "-01").strftime('%s'))
 
 def printData(data):
+    print("## Documentation and Platform Contributors Stats")
+    print()
+    print("The Mattermost repositories included in this summary are: mattermost-server, mattermost-webapp, mattermost-redux, mattermost-mobile, desktop, mattermost-utilities, mmctl, mattermost-load-test, mattermost-android-classic, mattermost-ios-classic, mattermost-push-proxy, docs, mattermost-api-reference, mattermost-developer-documentation.")
+    print()
+
     print("#### Contributions Per Month")
     for month, number in data['contributions_per_month'].items():
         print("- {}: {} community contributions".format(month, number))
