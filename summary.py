@@ -67,13 +67,13 @@ def printData(data):
         print("- {}: {} contributions".format(user, number))
     print()
 
-    print("#### Top community contributors")
+    print("#### Top community contributors (all time)")
     top25 = collections.OrderedDict(sorted(data['contributions_per_user'].items(), key=lambda x: -x[1])[0:25])
     for user, number in top25.items():
         print("- {}: {} contributions".format(user, number))
     print()
 
-    print("#### Top community contributors (Last year)")
+    print("#### Top community contributors (2019)")
     top25 = collections.OrderedDict(sorted(data['contributions_per_user_last_year'].items(), key=lambda x: -x[1])[0:25])
     for user, number in top25.items():
         print("- {}: {} contributions".format(user, number))
