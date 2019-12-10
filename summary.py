@@ -86,7 +86,7 @@ def printData(data):
 
     print("#### Recurrent contirbutors per month")
     for month, users in data['recurrent_contributors_per_month'].items():
-        print("- {}: {}".format(month, ", ".join(users)))
+        print("- {}: {}".format(month, ", ".join(sorted(users))))
     print()
 
     month, users = list(data['contributors_per_month'].items())[-1]
@@ -140,6 +140,8 @@ def plotPerMonthData(months, values, label, color, idx):
     ax.get_yaxis().tick_left()
 
     y_top = max(values)
+    if y_top < 10:
+        y_top = 10
 
     plt.ylim(0, y_top)
     plt.xlim(monthToInt(months[0]), monthToInt(months[-1]))
@@ -293,7 +295,8 @@ def get_recurrent_contributors_by_month(contributors, contributors_per_month):
         result[months[current_month]] = set()
         for contributor in contributors:
             last_12_months = list(contributors_per_month.values())[max(current_month-12, 0):current_month]
-            if contributions_last_year(contributor, last_12_months) >= 3:
+            last_3_months = list(contributors_per_month.values())[max(current_month-3, 0):current_month]
+            if contributions_last_year(contributor, last_12_months) >= 3 and contributions_last_year(contributor, last_3_months) >= 1:
                 result[months[current_month]].add(contributor)
 
     return result
