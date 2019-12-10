@@ -3,6 +3,7 @@ import click
 import collections
 import datetime
 import matplotlib.pyplot as plt
+import pprint
 
 tableau20 = [(31, 119, 180), (174, 199, 232), (255, 127, 14), (255, 187, 120),
              (44, 160, 44), (152, 223, 138), (214, 39, 40), (255, 152, 150),
@@ -83,6 +84,11 @@ def printData(data):
         print("- {}: {} (repo: {})".format(contrib['date'], contrib['user'], contrib['repo']))
     print()
 
+    print("#### Recurrent contirbutors per month")
+    for month, users in data['recurrent_contributors_per_month'].items():
+        print("- {}: {}".format(month, ", ".join(users)))
+    print()
+
     month, users = list(data['contributors_per_month'].items())[-1]
     print("#### This month contributors (month: {})".format(month))
     for user in sorted(users, key=str.casefold):
@@ -96,7 +102,7 @@ def printData(data):
     print()
 
 def plotHistogramOfContributions(contributions_per_user, label, color, idx):
-    ax = plt.subplot(8, 1, idx)
+    ax = plt.subplot(9, 1, idx)
     ax.spines["top"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -124,7 +130,7 @@ def plotHistogramOfContributions(contributions_per_user, label, color, idx):
     )
 
 def plotPerMonthData(months, values, label, color, idx):
-    ax = plt.subplot(8, 1, idx)
+    ax = plt.subplot(9, 1, idx)
     ax.spines["top"].set_visible(False)
     ax.spines["bottom"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -237,6 +243,8 @@ def cli(staff_json, contributions_json, plot):
         last_months = [contributors] + last_months
         last_months = last_months[0:4]
 
+    recurrent_contributors_per_month = get_recurrent_contributors_by_month(contributors, contributors_per_month)
+
     data = {
         'contributions_per_month': contributions_per_month,
         'accumulative_contributions_per_month': accumulative_contributions_per_month,
@@ -248,6 +256,7 @@ def cli(staff_json, contributions_json, plot):
         'contributions_per_user': contributions_per_user,
         'contributions_per_user_last_year': contributions_per_user_last_year,
         'first_contributions': first_contributions,
+        'recurrent_contributors_per_month': recurrent_contributors_per_month,
     }
 
     if plot:
@@ -263,10 +272,31 @@ def cli(staff_json, contributions_json, plot):
         plotPerMonthData(months, old_contributors_per_month, "Old Contributors\nPer Month", tableau20[5], 6)
         plotHistogramOfContributions(contributions_per_user, "Contributions\nper user", tableau20[6], 7)
         plotPerMonthData(months, list(map(len, active_contributors.values())), "Active Contributions\nPer Month", tableau20[7], 8)
+        plotPerMonthData(months, list(map(len, recurrent_contributors_per_month.values())), "Recurrent Contributors\nPer Month", tableau20[8], 9)
 
         plt.savefig("plots.png", bbox_inches="tight")
     else:
         printData(data)
+
+def contributions_last_year(username, contributors_per_month):
+    total = 0
+    for month in contributors_per_month:
+        if username in month:
+            total += 1
+    return total
+
+
+def get_recurrent_contributors_by_month(contributors, contributors_per_month):
+    result = collections.OrderedDict()
+    months = list(contributors_per_month.keys())
+    for current_month in range(0,len(months)):
+        result[months[current_month]] = set()
+        for contributor in contributors:
+            last_12_months = list(contributors_per_month.values())[max(current_month-12, 0):current_month]
+            if contributions_last_year(contributor, last_12_months) >= 3:
+                result[months[current_month]].add(contributor)
+
+    return result
 
 if __name__ == "__main__":
     cli()
