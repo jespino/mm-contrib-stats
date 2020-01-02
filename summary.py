@@ -57,8 +57,11 @@ def printData(data):
 
     print("#### Old Contributors Per Month")
     for month in data['contributors_per_month'].keys():
-        total = len(data['contributors_per_month'][month]) - len(data['new_contributors_per_month'][month])
-        print("- {}: {} community contributors".format(month, total))
+        new_contributors = []
+        if month in data['new_contributors_per_month']:
+            new_contributors = data['new_contributors_per_month'][month]
+            total = len(data['contributors_per_month'][month]) - len(new_contributors)
+            print("- {}: {} community contributors".format(month, total))
     print()
 
     print("#### Contributions Per User")
@@ -224,11 +227,11 @@ def cli(staff_json, contributions_json, plot):
         last_month = accumulative_contributions_per_month[month]
 
     new_contributors_per_month = collections.OrderedDict()
+    for month, contributions in contributions_per_month.items():
+        new_contributors_per_month[month] = set()
+
     for contribution in first_contributions:
-        if contribution["date"][0:7] in new_contributors_per_month:
-            new_contributors_per_month[contribution["date"][0:7]].add(contribution["user"])
-        else:
-            new_contributors_per_month[contribution["date"][0:7]] = set([contribution["user"]])
+        new_contributors_per_month[contribution["date"][0:7]].add(contribution["user"])
 
     accumulative_new_contributors_per_month = collections.OrderedDict()
     last_month = 0
