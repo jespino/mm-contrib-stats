@@ -22,7 +22,7 @@ def monthToInt(date):
 def printData(data):
     print("## Documentation, Platform and Hackathon Contributor Stats")
     print()
-    print("The Mattermost repositories included in this summary are: mattermost-server, mattermost-webapp, mattermost-redux, mattermost-mobile, desktop, mattermost-utilities, mmctl, mattermost-load-test, mattermost-android-classic, mattermost-ios-classic, mattermost-push-proxy, docs, mattermost-api-reference, mattermost-developer-documentation, mattermost-hackathon-nov2019.")
+    print("The Mattermost repositories included in this summary are: mattermost-server, mattermost-webapp, mattermost-redux, mattermost-mobile, desktop, mattermost-utilities, mmctl, mattermost-load-test, mattermost-android-classic, mattermost-ios-classic, mattermost-push-proxy, docs, mattermost-api-reference, mattermost-developer-documentation, mattermost-hackathon-nov2019, mattermost-hackathon-hackerearth-jan2020.")
     print()
 
     print("#### Contributions Per Month")
