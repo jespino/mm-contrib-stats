@@ -74,7 +74,7 @@ def contributors(token, org, repo, json, csv):
 
     writer = csvlib.writer(sys.stdout)
     if csv:
-        writer.writerow(["PR", "Merged At", "Author"])
+        writer.writerow(["PR", "Merged At", "Author", "Repo"])
 
     for one_repo in repo:
         has_next = True
@@ -101,9 +101,9 @@ def contributors(token, org, repo, json, csv):
                             "repo": one_repo,
                         })
                     elif csv:
-                        writer.writerow([node["number"], node["mergedAt"], node["author"]["login"]])
+                        writer.writerow([node["number"], node["mergedAt"], node["author"]["login"]], one_repo)
                     else:
-                        print("PR {} (Merged: {}): {}".format(node["number"], node["mergedAt"], node["author"]["login"]))
+                        print("PR {} (Merged: {}): {}".format(node["number"], node["mergedAt"], node["author"]["login"], one_repo))
 
     if json:
         print(jsonlib.dumps(data))
