@@ -1,4 +1,4 @@
 click==7.0
-Jinja2==2.10.3
+Jinja2==2.11.3
 PyGithub==1.43.8
 requests==2.22.0
